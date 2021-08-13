@@ -9,6 +9,8 @@ import net.minecraft.client.gui.advancements.AdvancementEntryGui;
 import net.minecraft.client.gui.advancements.AdvancementsScreen;
 import net.minecraft.client.multiplayer.ClientAdvancementManager;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ClientChatEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -19,6 +21,21 @@ public class ClientEventHandler
      * Blink time
      */
     private static final int BLINK_TIME_TICKS = 20 * 8;
+
+    private static final AdvancementProgress doneProgress = new AdvancementProgress()
+    {
+        @Override
+        public boolean isDone()
+        {
+            return true;
+        }
+
+        @OnlyIn(Dist.CLIENT)
+        public float getPercent()
+        {
+            return 105f;
+        }
+    };
 
     @SubscribeEvent
     public static void on(ClientChatEvent event)
@@ -36,11 +53,16 @@ public class ClientEventHandler
             }
 
             final Advancement advancement = manager.getAdvancements().get(id);
-            final Advancement tab = manager.getAdvancements().get(new ResourceLocation(id.getNamespace(), id.getPath().split("/")[0] + "/root"));
+            Advancement tab = manager.getAdvancements().get(new ResourceLocation(id.getNamespace(), id.getPath().split("/")[0] + "/root"));
 
             if (tab == null)
             {
-                return;
+                tab = manager.getAdvancements().get(new ResourceLocation(id.getNamespace(), "root"));
+
+                if (tab == null)
+                {
+                    return;
+                }
             }
 
             final AdvancementsScreen screen = new AdvancementsScreen(manager);
@@ -49,7 +71,6 @@ public class ClientEventHandler
             if (Minecraft.getInstance().screen instanceof AdvancementsScreen)
             {
                 final AdvancementsScreen actualScreen = (AdvancementsScreen) Minecraft.getInstance().screen;
-
                 if (actualScreen.selectedTab == null || advancement == null)
                 {
                     return;
@@ -62,39 +83,54 @@ public class ClientEventHandler
                 final int midY = (actualScreen.selectedTab.maxY - actualScreen.selectedTab.minY) / 2;
 
                 actualScreen.selectedTab.scroll(midX - entry.getX(), midY - entry.getY());
+            }
 
-                flashingEntry = entry;
+            if (Minecraft.getInstance().screen instanceof ClientAdvancementManager.IListener)
+            {
+                listener = (ClientAdvancementManager.IListener) Minecraft.getInstance().screen;
+                flashingEntry = advancement;
                 counter = 0;
-                progressInfo = entry.progress;
+                progressInfo = manager.progress.get(advancement);
             }
         }
     }
 
-    static AdvancementEntryGui flashingEntry = null;
-    static AdvancementProgress progressInfo  = null;
-    static int                 counter       = 0;
+    static ClientAdvancementManager.IListener listener      = null;
+    static Advancement                        flashingEntry = null;
+    static AdvancementProgress                progressInfo  = null;
+    static int                                counter       = 0;
 
     @SubscribeEvent
     public static void OnTick(TickEvent.ClientTickEvent event)
     {
-        if (flashingEntry != null)
+        if (flashingEntry != null && Minecraft.getInstance().screen == listener)
         {
             if (++counter >= 10)
             {
                 if (counter % 20 >= 10)
                 {
-                    flashingEntry.setProgress(null);
+                    listener.onUpdateAdvancementProgress(flashingEntry, null);
                 }
                 else
                 {
-                    flashingEntry.setProgress(progressInfo);
+                    listener.onUpdateAdvancementProgress(flashingEntry, doneProgress);
                     if (counter > BLINK_TIME_TICKS)
                     {
                         counter = 0;
+                        listener.onUpdateAdvancementProgress(flashingEntry, progressInfo);
                         flashingEntry = null;
                     }
                 }
             }
         }
     }
+/*
+    @SubscribeEvent
+    public static void on(EntityViewRenderEvent.CameraSetup event)
+    {
+        if (Minecraft.getInstance().player != null && Minecraft.getInstance().player.isSleeping())
+        {
+            Minecraft.getInstance().options.setCameraType(PointOfView.THIRD_PERSON_BACK);
+        }
+    }*/
 }
