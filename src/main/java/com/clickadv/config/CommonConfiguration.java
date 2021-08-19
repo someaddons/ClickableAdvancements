@@ -11,7 +11,10 @@ public class CommonConfiguration
     {
         builder.push("Config category");
 
-        builder.comment("Whether to show all advancements in local player chat");
+        builder.comment("By default vanilla only displays advancements in chat which get broadcasted to all online players,"
+                          + "this setting turns on showing all advancements achieved in chat instead. That way you can find"
+                          + "the advancements you got easier/see better which you get. Some of these may have no actual text though because"
+                          + " the advancement itself doesnt have any, e.g. Categories are advancements too. default = true");
         showAllInLocalChat = builder.define("showAllInLocalChat", true);
 
         // Escapes the current category level
