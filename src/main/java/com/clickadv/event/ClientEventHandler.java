@@ -61,7 +61,7 @@ public class ClientEventHandler
 
                 if (tab == null)
                 {
-                    return;
+                    tab = advancement;
                 }
             }
 
@@ -124,13 +124,4 @@ public class ClientEventHandler
             }
         }
     }
-/*
-    @SubscribeEvent
-    public static void on(EntityViewRenderEvent.CameraSetup event)
-    {
-        if (Minecraft.getInstance().player != null && Minecraft.getInstance().player.isSleeping())
-        {
-            Minecraft.getInstance().options.setCameraType(PointOfView.THIRD_PERSON_BACK);
-        }
-    }*/
 }
