@@ -22,7 +22,9 @@ public class EventHandler
         // Inverted condition of #PlayerAdvancements to exclude when we already sent it to all
         if (!(event.getAdvancement().getDisplay().shouldAnnounceChat() && event.getPlayer().level.getGameRules().getBoolean(GameRules.RULE_ANNOUNCE_ADVANCEMENTS)))
         {
-            if (ClickAdvancements.config.getCommonConfig().showAllInLocalChat.get() || event.getAdvancement().getDisplay().shouldAnnounceChat())
+            if ((ClickAdvancements.config.getCommonConfig().showAllInLocalChat.get() && event.getAdvancement().getParent() != null) || event.getAdvancement()
+              .getDisplay()
+              .shouldAnnounceChat())
             {
                 event.getPlayer().sendMessage(AdvancementHelper.buildAdvancementChatInfo(event.getAdvancement()), event.getPlayer().getUUID());
             }
