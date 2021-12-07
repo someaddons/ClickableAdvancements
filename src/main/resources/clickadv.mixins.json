@@ -1,0 +1,19 @@
+{
+  "required": false,
+  "package": "com.clickadv.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "clickadv.refmap.json",
+  "mixins": [
+    "PlayerAdvancementsMixin"
+  ],
+  "client": [
+    "AdvancementsScreenMixin",
+    "AdvancementTabMixin",
+    "ClientAdvancementManagerMixin",
+    "ScreenMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "minVersion": "0.8"
+}
