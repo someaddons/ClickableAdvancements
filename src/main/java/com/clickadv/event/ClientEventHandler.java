@@ -56,7 +56,25 @@ public class ClientEventHandler
 
                 if (tab == null)
                 {
-                    tab = advancement;
+                    Advancement current = advancement;
+
+                    for (int i = 0; i < 20; i++)
+                    {
+                        if (current.getParent() != null)
+                        {
+                            tab = current.getParent();
+                            current = current.getParent();
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+
+                    if (tab == null)
+                    {
+                        tab = advancement;
+                    }
                 }
             }
 
