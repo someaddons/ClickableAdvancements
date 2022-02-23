@@ -113,10 +113,11 @@ public class ClientEventHandler
         return false;
     }
 
-    static ClientAdvancementManager.Listener listener      = null;
-    static Advancement                       flashingEntry = null;
-    static AdvancementProgress               progressInfo  = null;
-    static int                               counter       = 0;
+    static               ClientAdvancementManager.Listener listener      = null;
+    static               Advancement                       flashingEntry = null;
+    static               AdvancementProgress               progressInfo  = null;
+    static               int                               counter       = 0;
+    private static final AdvancementProgress               noProgress    = new AdvancementProgress();
 
     public static void onTick(final Screen screen)
     {
@@ -126,7 +127,7 @@ public class ClientEventHandler
             {
                 if (counter % 20 >= 10)
                 {
-                    listener.setProgress(flashingEntry, null);
+                    listener.setProgress(flashingEntry, noProgress);
                 }
                 else
                 {
