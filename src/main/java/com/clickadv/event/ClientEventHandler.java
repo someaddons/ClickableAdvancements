@@ -113,10 +113,11 @@ public class ClientEventHandler
         }
     }
 
-    static ClientAdvancements.Listener listener      = null;
-    static Advancement                 flashingEntry = null;
-    static AdvancementProgress         progressInfo  = null;
-    static int                         counter       = 0;
+    static               ClientAdvancements.Listener listener      = null;
+    static               Advancement                 flashingEntry = null;
+    static               AdvancementProgress         progressInfo  = null;
+    static               int                         counter       = 0;
+    private static final AdvancementProgress         noProgress    = new AdvancementProgress();
 
     @SubscribeEvent
     public static void OnTick(TickEvent.ClientTickEvent event)
@@ -127,7 +128,7 @@ public class ClientEventHandler
             {
                 if (counter % 20 >= 10)
                 {
-                    listener.onUpdateAdvancementProgress(flashingEntry, null);
+                    listener.onUpdateAdvancementProgress(flashingEntry, noProgress);
                 }
                 else
                 {
