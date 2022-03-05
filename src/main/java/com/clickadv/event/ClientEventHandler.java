@@ -1,5 +1,6 @@
 package com.clickadv.event;
 
+import com.clickadv.ClickAdvancements;
 import com.clickadv.advancements.AdvancementHelper;
 import net.minecraft.advancement.Advancement;
 import net.minecraft.advancement.AdvancementProgress;
@@ -57,6 +58,12 @@ public class ClientEventHandler
                 if (tab == null)
                 {
                     Advancement current = advancement;
+
+                    if (current == null)
+                    {
+                        ClickAdvancements.LOGGER.info("Could not find advancement for id:"+ id);
+                        return true;
+                    }
 
                     for (int i = 0; i < 20; i++)
                     {
