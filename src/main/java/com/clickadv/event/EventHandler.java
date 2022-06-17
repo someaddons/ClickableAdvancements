@@ -2,6 +2,8 @@ package com.clickadv.event;
 
 import com.clickadv.ClickAdvancements;
 import com.clickadv.advancements.AdvancementHelper;
+import net.minecraft.network.chat.ChatType;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.GameRules;
 import net.minecraftforge.event.entity.player.AdvancementEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -26,7 +28,7 @@ public class EventHandler
               .getDisplay()
               .shouldAnnounceChat())
             {
-                event.getPlayer().sendMessage(AdvancementHelper.buildAdvancementChatInfo(event.getAdvancement()), event.getPlayer().getUUID());
+                ((ServerPlayer) event.getPlayer()).sendSystemMessage(AdvancementHelper.buildAdvancementChatInfo(event.getAdvancement()), ChatType.CHAT);
             }
         }
     }
