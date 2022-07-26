@@ -22,13 +22,13 @@ public class EventHandler
         }
 
         // Inverted condition of #PlayerAdvancements to exclude when we already sent it to all
-        if (!(event.getAdvancement().getDisplay().shouldAnnounceChat() && event.getPlayer().level.getGameRules().getBoolean(GameRules.RULE_ANNOUNCE_ADVANCEMENTS)))
+        if (!(event.getAdvancement().getDisplay().shouldAnnounceChat() && event.getEntity().level.getGameRules().getBoolean(GameRules.RULE_ANNOUNCE_ADVANCEMENTS)))
         {
             if ((ClickAdvancements.config.getCommonConfig().showAllInLocalChat.get() && event.getAdvancement().getParent() != null) || event.getAdvancement()
               .getDisplay()
               .shouldAnnounceChat())
             {
-                ((ServerPlayer) event.getPlayer()).sendSystemMessage(AdvancementHelper.buildAdvancementChatInfo(event.getAdvancement()), ChatType.CHAT);
+                ((ServerPlayer) event.getEntity()).sendSystemMessage(AdvancementHelper.buildAdvancementChatInfo(event.getAdvancement()), ChatType.CHAT);
             }
         }
     }
