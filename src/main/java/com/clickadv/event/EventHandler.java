@@ -28,7 +28,7 @@ public class EventHandler
               .getDisplay()
               .shouldAnnounceChat())
             {
-                ((ServerPlayer) event.getEntity()).sendSystemMessage(AdvancementHelper.buildAdvancementChatInfo(event.getAdvancement()), ChatType.CHAT);
+                ((ServerPlayer) event.getEntity()).sendSystemMessage(AdvancementHelper.buildAdvancementChatInfo(event.getAdvancement()), false);
             }
         }
     }

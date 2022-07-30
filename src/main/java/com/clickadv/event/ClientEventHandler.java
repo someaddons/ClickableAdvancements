@@ -11,7 +11,6 @@ import net.minecraft.client.multiplayer.ClientAdvancements;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.ClientChatEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
@@ -37,19 +36,17 @@ public class ClientEventHandler
         }
     };
 
-    @SubscribeEvent
-    public static void on(ClientChatEvent event)
+    public static boolean onMessage(String message)
     {
-        if (event.getOriginalMessage().contains(AdvancementHelper.COMMAND) && Minecraft.getInstance().player != null)
+        if (message.contains(AdvancementHelper.COMMAND) && Minecraft.getInstance().player != null)
         {
-            event.setMessage("");
 
             final ClientAdvancements manager = Minecraft.getInstance().player.connection.getAdvancements();
-            final ResourceLocation id = AdvancementHelper.getAdvancementID(event.getOriginalMessage());
+            final ResourceLocation id = AdvancementHelper.getAdvancementID(message);
 
             if (id == null)
             {
-                return;
+                return true;
             }
 
             final Advancement advancement = manager.getAdvancements().get(id);
@@ -62,6 +59,11 @@ public class ClientEventHandler
                 if (tab == null)
                 {
                     Advancement current = advancement;
+
+                    if (advancement == null)
+                    {
+                        return true;
+                    }
 
                     for (int i = 0; i < 20; i++)
                     {
@@ -91,7 +93,7 @@ public class ClientEventHandler
                 final AdvancementsScreen actualScreen = (AdvancementsScreen) Minecraft.getInstance().screen;
                 if (actualScreen.selectedTab == null || advancement == null)
                 {
-                    return;
+                    return true;
                 }
 
                 actualScreen.selectedTab.drawContents(new PoseStack());
@@ -110,7 +112,10 @@ public class ClientEventHandler
                 counter = 0;
                 progressInfo = manager.progress.get(advancement);
             }
+
+            return true;
         }
+        return false;
     }
 
     static               ClientAdvancements.Listener listener      = null;
