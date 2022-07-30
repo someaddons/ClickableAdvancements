@@ -4,7 +4,6 @@ import com.clickadv.ClickAdvancements;
 import com.clickadv.advancements.AdvancementHelper;
 import net.minecraft.advancement.Advancement;
 import net.minecraft.advancement.PlayerAdvancementTracker;
-import net.minecraft.network.message.MessageType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.world.GameRules;
@@ -36,7 +35,7 @@ public class PlayerAdvancementsMixin
               .getDisplay()
               .shouldAnnounceToChat())
             {
-                owner.sendMessage(AdvancementHelper.buildAdvancementChatInfo(advancement), MessageType.CHAT);
+                owner.sendMessage(AdvancementHelper.buildAdvancementChatInfo(advancement), false);
             }
         }
     }
