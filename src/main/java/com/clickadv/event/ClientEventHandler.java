@@ -40,7 +40,6 @@ public class ClientEventHandler
     {
         if (message.contains(AdvancementHelper.COMMAND) && Minecraft.getInstance().player != null)
         {
-
             final ClientAdvancements manager = Minecraft.getInstance().player.connection.getAdvancements();
             final ResourceLocation id = AdvancementHelper.getAdvancementID(message);
 

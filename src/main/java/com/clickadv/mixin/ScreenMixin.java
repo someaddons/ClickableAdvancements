@@ -16,7 +16,7 @@ public class ScreenMixin
     private void onSendText(final Style style, final CallbackInfoReturnable<Boolean> cir)
     {
         final ClickEvent event = style.getClickEvent();
-        if (ClientEventHandler.onMessage(event.getValue()))
+        if (event != null && ClientEventHandler.onMessage(event.getValue()))
         {
             cir.setReturnValue(false);
         }
