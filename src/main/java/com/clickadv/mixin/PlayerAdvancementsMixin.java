@@ -5,7 +5,10 @@ import com.clickadv.advancements.AdvancementHelper;
 import net.minecraft.advancement.Advancement;
 import net.minecraft.advancement.PlayerAdvancementTracker;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.world.GameRules;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -35,6 +38,27 @@ public class PlayerAdvancementsMixin
               .getDisplay()
               .shouldAnnounceToChat())
             {
+                if (advancement.toHoverableText().getString().contains("recipe"))
+                {
+                    return;
+                }
+
+                MutableText desc = (MutableText) advancement.getDisplay().getDescription();
+                MutableText header = (MutableText) AdvancementHelper.buildAdvancementChatInfo(advancement);
+
+                int lenght = header.getString().length();
+
+                if (desc != null)
+                {
+                    header.append(Text.literal(" ")).append(desc.setStyle(Style.EMPTY.withFormatting(Formatting.WHITE)));
+                    lenght += desc.getString().length();
+                }
+
+                if (lenght > 120)
+                {
+                    return;
+                }
+
                 owner.sendMessage(AdvancementHelper.buildAdvancementChatInfo(advancement), false);
             }
         }

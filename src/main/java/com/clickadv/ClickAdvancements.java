@@ -18,6 +18,7 @@ public class ClickAdvancements implements ModInitializer
     @Override
     public void onInitialize()
     {
+        config.load();
         LOGGER.info(MODID + " mod initialized");
     }
 }
