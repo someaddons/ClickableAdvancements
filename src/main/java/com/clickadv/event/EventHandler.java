@@ -2,7 +2,10 @@ package com.clickadv.event;
 
 import com.clickadv.ClickAdvancements;
 import com.clickadv.advancements.AdvancementHelper;
-import net.minecraft.network.chat.ChatType;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.GameRules;
 import net.minecraftforge.event.entity.player.AdvancementEvent;
@@ -28,7 +31,28 @@ public class EventHandler
               .getDisplay()
               .shouldAnnounceChat())
             {
-                ((ServerPlayer) event.getEntity()).sendSystemMessage(AdvancementHelper.buildAdvancementChatInfo(event.getAdvancement()), false);
+                if (event.getAdvancement().getChatComponent().getString().contains("recipe"))
+                {
+                    return;
+                }
+
+                MutableComponent desc = (MutableComponent) event.getAdvancement().getDisplay().getDescription();
+                MutableComponent header = (MutableComponent) AdvancementHelper.buildAdvancementChatInfo(event.getAdvancement());
+
+                int lenght = header.getString().length();
+
+                if (desc != null)
+                {
+                    header.append(Component.literal(" ")).append(desc.setStyle(Style.EMPTY.applyFormat(ChatFormatting.WHITE)));
+                    lenght += desc.getString().length();
+                }
+
+                if (lenght > 120)
+                {
+                    return;
+                }
+
+                ((ServerPlayer) event.getEntity()).sendSystemMessage(header, false);
             }
         }
     }
