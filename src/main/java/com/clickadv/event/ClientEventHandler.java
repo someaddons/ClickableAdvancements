@@ -97,7 +97,7 @@ public class ClientEventHandler
                     return true;
                 }
 
-                selectedTab.render(new MatrixStack());
+                selectedTab.render(new MatrixStack(), 0, 0);
                 final AdvancementWidget entry = actualScreen.getAdvancementWidget(advancement);
 
                 final int midX = (((IAdvancementTabGetter) selectedTab).maxX() - ((IAdvancementTabGetter) selectedTab).minX()) / 2;
