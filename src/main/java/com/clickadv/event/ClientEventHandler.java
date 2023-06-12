@@ -1,5 +1,6 @@
 package com.clickadv.event;
 
+import com.clickadv.ClickAdvancements;
 import com.clickadv.advancements.AdvancementHelper;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.advancements.Advancement;
@@ -61,6 +62,7 @@ public class ClientEventHandler
 
                     if (advancement == null)
                     {
+                        ClickAdvancements.LOGGER.info("Could not find advancement for id:" + id);
                         return true;
                     }
 
