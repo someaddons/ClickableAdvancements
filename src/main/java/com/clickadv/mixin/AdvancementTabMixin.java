@@ -1,7 +1,7 @@
 package com.clickadv.mixin;
 
 import com.clickadv.event.IAdvancementTabGetter;
-import net.minecraft.client.gui.screen.advancement.AdvancementTab;
+import net.minecraft.client.gui.screens.advancements.AdvancementTab;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
@@ -10,38 +10,38 @@ public class AdvancementTabMixin implements IAdvancementTabGetter
 {
 
     @Shadow
-    private int maxPanX;
+    private int maxX;
 
     @Shadow
-    private int minPanY;
+    private int minY;
 
     @Shadow
-    private int minPanX;
+    private int minX;
 
     @Shadow
-    private int maxPanY;
+    private int maxY;
 
     @Override
     public int maxX()
     {
-        return maxPanX;
+        return maxX;
     }
 
     @Override
     public int minX()
     {
-        return minPanX;
+        return minX;
     }
 
     @Override
     public int minY()
     {
-        return minPanY;
+        return minY;
     }
 
     @Override
     public int maxY()
     {
-        return maxPanY;
+        return maxY;
     }
 }

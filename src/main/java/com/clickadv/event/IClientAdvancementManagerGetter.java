@@ -1,7 +1,7 @@
 package com.clickadv.event;
 
-import net.minecraft.advancement.Advancement;
-import net.minecraft.advancement.AdvancementProgress;
+import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.AdvancementProgress;
 
 import java.util.Map;
 

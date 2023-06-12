@@ -2,16 +2,15 @@ package com.clickadv.event;
 
 import com.clickadv.ClickAdvancements;
 import com.clickadv.advancements.AdvancementHelper;
-import net.minecraft.advancement.Advancement;
-import net.minecraft.advancement.AdvancementProgress;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.advancement.AdvancementTab;
-import net.minecraft.client.gui.screen.advancement.AdvancementWidget;
-import net.minecraft.client.gui.screen.advancement.AdvancementsScreen;
-import net.minecraft.client.network.ClientAdvancementManager;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.AdvancementProgress;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.advancements.AdvancementWidget;
+import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
+import net.minecraft.client.multiplayer.ClientAdvancements;
+import net.minecraft.resources.ResourceLocation;
 
 public class ClientEventHandler
 {
@@ -29,7 +28,7 @@ public class ClientEventHandler
         }
 
         @Override
-        public float getProgressBarPercentage()
+        public float getPercent()
         {
             return 105f;
         }
@@ -37,23 +36,23 @@ public class ClientEventHandler
 
     public static boolean onMessage(final String message)
     {
-        if (message.contains(AdvancementHelper.COMMAND) && MinecraftClient.getInstance().player != null)
+        if (message.contains(AdvancementHelper.COMMAND) && Minecraft.getInstance().player != null)
         {
 
-            final ClientAdvancementManager manager = MinecraftClient.getInstance().player.networkHandler.getAdvancementHandler();
-            final Identifier id = AdvancementHelper.getAdvancementID(message);
+            final ClientAdvancements manager = Minecraft.getInstance().player.connection.getAdvancements();
+            final ResourceLocation id = AdvancementHelper.getAdvancementID(message);
 
             if (id == null)
             {
                 return true;
             }
 
-            final Advancement advancement = manager.getManager().get(id);
-            Advancement tab = manager.getManager().get(new Identifier(id.getNamespace(), id.getPath().split("/")[0] + "/root"));
+            final Advancement advancement = manager.getAdvancements().get(id);
+            Advancement tab = manager.getAdvancements().get(new ResourceLocation(id.getNamespace(), id.getPath().split("/")[0] + "/root"));
 
             if (tab == null)
             {
-                tab = manager.getManager().get(new Identifier(id.getNamespace(), "root"));
+                tab = manager.getAdvancements().get(new ResourceLocation(id.getNamespace(), "root"));
 
                 if (tab == null)
                 {
@@ -61,7 +60,7 @@ public class ClientEventHandler
 
                     if (current == null)
                     {
-                        ClickAdvancements.LOGGER.info("Could not find advancement for id:"+ id);
+                        ClickAdvancements.LOGGER.info("Could not find advancement for id:" + id);
                         return true;
                     }
 
@@ -86,29 +85,28 @@ public class ClientEventHandler
             }
 
             final AdvancementsScreen screen = new AdvancementsScreen(manager);
-            MinecraftClient.getInstance().setScreen(screen);
-            manager.selectTab(tab, true);
-            if (MinecraftClient.getInstance().currentScreen instanceof AdvancementsScreen)
+            Minecraft.getInstance().setScreen(screen);
+            manager.setSelectedTab(tab, true);
+            if (Minecraft.getInstance().screen instanceof AdvancementsScreen)
             {
-                final AdvancementsScreen actualScreen = (AdvancementsScreen) MinecraftClient.getInstance().currentScreen;
-                final AdvancementTab selectedTab = ((IAdvancementsScreenGetter) actualScreen).getCurrentTab();
-                if (selectedTab == null || advancement == null)
+                final AdvancementsScreen actualScreen = (AdvancementsScreen) Minecraft.getInstance().screen;
+                if (actualScreen.selectedTab == null || advancement == null)
                 {
                     return true;
                 }
 
-                selectedTab.render(new MatrixStack(), 0, 0);
+                actualScreen.selectedTab.drawContents(new PoseStack(), 0, 0);
                 final AdvancementWidget entry = actualScreen.getAdvancementWidget(advancement);
 
-                final int midX = (((IAdvancementTabGetter) selectedTab).maxX() - ((IAdvancementTabGetter) selectedTab).minX()) / 2;
-                final int midY = (((IAdvancementTabGetter) selectedTab).maxY() - ((IAdvancementTabGetter) selectedTab).minY()) / 2;
+                final int midX = (((IAdvancementTabGetter) actualScreen.selectedTab).maxX() - ((IAdvancementTabGetter) actualScreen.selectedTab).minX()) / 2;
+                final int midY = (((IAdvancementTabGetter) actualScreen.selectedTab).maxY() - ((IAdvancementTabGetter) actualScreen.selectedTab).minY()) / 2;
 
-                selectedTab.move(midX - entry.getX(), midY - entry.getY());
+                actualScreen.selectedTab.scroll(midX - entry.getX(), midY - entry.getY());
             }
 
-            if (MinecraftClient.getInstance().currentScreen instanceof ClientAdvancementManager.Listener)
+            if (Minecraft.getInstance().screen instanceof ClientAdvancements.Listener)
             {
-                listener = (ClientAdvancementManager.Listener) MinecraftClient.getInstance().currentScreen;
+                listener = (ClientAdvancements.Listener) Minecraft.getInstance().screen;
                 flashingEntry = advancement;
                 counter = 0;
                 progressInfo = ((IClientAdvancementManagerGetter) manager).getAdvancementProgressMap().get(advancement);
@@ -116,33 +114,32 @@ public class ClientEventHandler
 
             return true;
         }
-
         return false;
     }
 
-    static               ClientAdvancementManager.Listener listener      = null;
-    static               Advancement                       flashingEntry = null;
-    static               AdvancementProgress               progressInfo  = null;
-    static               int                               counter       = 0;
-    private static final AdvancementProgress               noProgress    = new AdvancementProgress();
+    static               ClientAdvancements.Listener listener      = null;
+    static               Advancement                 flashingEntry = null;
+    static               AdvancementProgress         progressInfo  = null;
+    static               int                         counter       = 0;
+    private static final AdvancementProgress         noProgress    = new AdvancementProgress();
 
     public static void onTick(final Screen screen)
     {
-        if (flashingEntry != null && screen == listener)
+        if (flashingEntry != null && Minecraft.getInstance().screen == listener)
         {
             if (++counter >= 10)
             {
                 if (counter % 20 >= 10)
                 {
-                    listener.setProgress(flashingEntry, noProgress);
+                    listener.onUpdateAdvancementProgress(flashingEntry, noProgress);
                 }
                 else
                 {
-                    listener.setProgress(flashingEntry, doneProgress);
+                    listener.onUpdateAdvancementProgress(flashingEntry, doneProgress);
                     if (counter > BLINK_TIME_TICKS)
                     {
                         counter = 0;
-                        listener.setProgress(flashingEntry, progressInfo);
+                        listener.onUpdateAdvancementProgress(flashingEntry, progressInfo);
                         flashingEntry = null;
                     }
                 }

@@ -1,18 +1,18 @@
 package com.clickadv.advancements;
 
-import net.minecraft.advancement.Advancement;
-import net.minecraft.text.ClickEvent;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.advancements.Advancement;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceLocation;
 
 public class AdvancementHelper
 {
     public static final String COMMAND = "advopen ";
 
-    public static Text buildAdvancementChatInfo(final Advancement advancement)
+    public static Component buildAdvancementChatInfo(final Advancement advancement)
     {
-        final MutableText org = (MutableText) advancement.toHoverableText();
+        final MutableComponent org = (MutableComponent) advancement.getChatComponent();
         org.setStyle(org.getStyle().withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, COMMAND + advancement.getId())));
         return org;
     }
@@ -23,8 +23,8 @@ public class AdvancementHelper
      * @param chatcommand
      * @return
      */
-    public static Identifier getAdvancementID(final String chatcommand)
+    public static ResourceLocation getAdvancementID(final String chatcommand)
     {
-        return Identifier.tryParse(chatcommand.replace(COMMAND, ""));
+        return ResourceLocation.tryParse(chatcommand.replace(COMMAND, ""));
     }
 }
