@@ -97,7 +97,7 @@ public class ClientEventHandler
                     return true;
                 }
 
-                actualScreen.selectedTab.drawContents(new PoseStack(), 0, 0);
+                //actualScreen.selectedTab.drawContents(new PoseStack(), 0, 0);
                 final AdvancementWidget entry = actualScreen.getAdvancementWidget(advancement);
 
                 final int midX = (actualScreen.selectedTab.maxX - actualScreen.selectedTab.minX) / 2;
