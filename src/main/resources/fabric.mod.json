@@ -25,7 +25,7 @@
   "mixins": [
     "clickadv.mixins.json"
   ],
-
+  "accessWidener": "clickadv.accessWidener",
   "depends": {
     "fabricloader": ">=0.11.3",
     "fabric": "*",
