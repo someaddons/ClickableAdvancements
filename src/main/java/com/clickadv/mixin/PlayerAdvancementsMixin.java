@@ -32,7 +32,7 @@ public class PlayerAdvancementsMixin
     @Inject(method = "award", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/PlayerAdvancements;markForVisibilityUpdate(Lnet/minecraft/advancements/Advancement;)V"))
     public void onGrant(final Advancement advancement, final String criterionName, final CallbackInfoReturnable<Boolean> cir)
     {
-        if (advancement.getDisplay() != null && !(advancement.getDisplay().shouldAnnounceChat() && player.level.getGameRules().getBoolean(GameRules.RULE_ANNOUNCE_ADVANCEMENTS)))
+        if (advancement.getDisplay() != null && !(advancement.getDisplay().shouldAnnounceChat() && player.level().getGameRules().getBoolean(GameRules.RULE_ANNOUNCE_ADVANCEMENTS)))
         {
             if ((ClickAdvancements.config.getCommonConfig().showAllInLocalChat && advancement.getParent() != null) || advancement
               .getDisplay()

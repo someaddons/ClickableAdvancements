@@ -2,7 +2,6 @@ package com.clickadv.event;
 
 import com.clickadv.ClickAdvancements;
 import com.clickadv.advancements.AdvancementHelper;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.client.Minecraft;
@@ -95,7 +94,6 @@ public class ClientEventHandler
                     return true;
                 }
 
-                actualScreen.selectedTab.drawContents(new PoseStack(), 0, 0);
                 final AdvancementWidget entry = actualScreen.getAdvancementWidget(advancement);
 
                 final int midX = (((IAdvancementTabGetter) actualScreen.selectedTab).maxX() - ((IAdvancementTabGetter) actualScreen.selectedTab).minX()) / 2;
