@@ -1,9 +1,10 @@
 package com.clickadv;
 
-import com.clickadv.config.Configuration;
+import com.clickadv.config.CommonConfiguration;
 import com.clickadv.event.ClientEventHandler;
 import com.clickadv.event.EventHandler;
 import com.clickadv.event.ModEventHandler;
+import com.cupboard.config.CupboardConfig;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.IExtensionPoint;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -23,10 +24,10 @@ import static com.clickadv.ClickAdvancements.MODID;
 @Mod(MODID)
 public class ClickAdvancements
 {
-    public static final String        MODID  = "clickadv";
-    public static final Logger        LOGGER = LogManager.getLogger();
-    public static       Configuration config = new Configuration();
-    public static       Random        rand   = new Random();
+    public static final String                              MODID  = "clickadv";
+    public static final Logger                              LOGGER = LogManager.getLogger();
+    public static       CupboardConfig<CommonConfiguration> config = new CupboardConfig<>(MODID, new CommonConfiguration());
+    public static       Random                              rand   = new Random();
 
     public ClickAdvancements()
     {
@@ -35,7 +36,6 @@ public class ClickAdvancements
         Mod.EventBusSubscriber.Bus.FORGE.bus().get().register(EventHandler.class);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::clientSetup);
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, config.getCommonConfig().ForgeConfigSpecBuilder);
     }
 
     @SubscribeEvent
