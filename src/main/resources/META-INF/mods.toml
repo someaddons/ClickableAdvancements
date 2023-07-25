@@ -56,3 +56,10 @@ clickadv mod^, lets you click on advancements in chat
     versionRange="[1.20,1.30)"
     ordering="NONE"
     side="BOTH"
+[[dependencies.clickadv]]
+    modId="cupboard"
+    mandatory=true
+# This version range declares a minimum of the current minecraft version up to but not including the next major version
+    versionRange="[1.2,)"
+    ordering="NONE"
+    side="BOTH"
