@@ -34,7 +34,7 @@ public class PlayerAdvancementsMixin
     {
         if (advancement.getDisplay() != null && !(advancement.getDisplay().shouldAnnounceChat() && player.level().getGameRules().getBoolean(GameRules.RULE_ANNOUNCE_ADVANCEMENTS)))
         {
-            if ((ClickAdvancements.config.getCommonConfig().showAllInLocalChat && advancement.getParent() != null) || advancement
+            if ((ClickAdvancements.config.getCommonConfig().showAllInLocalChat && advancement.getParent() != null && advancement.getDisplay().shouldShowToast()) || advancement
               .getDisplay()
               .shouldAnnounceChat())
             {
