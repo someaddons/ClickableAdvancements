@@ -17,7 +17,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 public class EventHandler
 {
     @SubscribeEvent
-    public static void onADv(final AdvancementEvent event)
+    public static void onADv(final AdvancementEvent.AdvancementEarnEvent event)
     {
         if (event.getAdvancement().getDisplay() == null)
         {
@@ -27,9 +27,11 @@ public class EventHandler
         // Inverted condition of #PlayerAdvancements to exclude when we already sent it to all
         if (!(event.getAdvancement().getDisplay().shouldAnnounceChat() && event.getEntity().level().getGameRules().getBoolean(GameRules.RULE_ANNOUNCE_ADVANCEMENTS)))
         {
-            if ((ClickAdvancements.config.getCommonConfig().showAllInLocalChat && event.getAdvancement().getParent() != null) || event.getAdvancement()
-              .getDisplay()
-              .shouldAnnounceChat())
+            if (
+              (ClickAdvancements.config.getCommonConfig().showAllInLocalChat && event.getAdvancement().getParent() != null && event.getAdvancement().getDisplay().shouldShowToast())
+                || event.getAdvancement()
+                .getDisplay()
+                .shouldAnnounceChat())
             {
                 if (event.getAdvancement().getChatComponent().getString().contains("recipe"))
                 {
