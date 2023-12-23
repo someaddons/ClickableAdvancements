@@ -15,6 +15,11 @@ public class ScreenMixin
     @Inject(method = "handleComponentClicked", at = @At("HEAD"), cancellable = true)
     private void onSendText(final Style style, final CallbackInfoReturnable<Boolean> cir)
     {
+        if (style == null)
+        {
+            return;
+        }
+
         final ClickEvent event = style.getClickEvent();
         if (event != null && ClientEventHandler.onMessage(event.getValue()))
         {
