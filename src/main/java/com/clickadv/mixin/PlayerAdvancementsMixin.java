@@ -34,6 +34,20 @@ public class PlayerAdvancementsMixin
     {
         if (advancement.getDisplay() != null && !(advancement.getDisplay().shouldAnnounceChat() && player.level().getGameRules().getBoolean(GameRules.RULE_ANNOUNCE_ADVANCEMENTS)))
         {
+            if (!(player instanceof ServerPlayer))
+            {
+                return;
+            }
+
+            if (player.getClass() != ServerPlayer.class && ((ServerPlayer) player).connection == null)
+            {
+                ClickAdvancements.LOGGER.error(
+                  "Trying to award advancement to a fake player which does not have a connection either, this is a bug in another mod and should not happen. printing trace: Entity:"
+                    + player,
+                  new Exception());
+                return;
+            }
+
             if ((ClickAdvancements.config.getCommonConfig().showAllInLocalChat && advancement.getParent() != null && advancement.getDisplay().shouldShowToast()) || advancement
               .getDisplay()
               .shouldAnnounceChat())
