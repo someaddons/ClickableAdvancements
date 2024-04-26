@@ -10,6 +10,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.GameRules;
 import net.minecraftforge.event.entity.player.AdvancementEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import org.jline.utils.Log;
 
 /**
  * Forge event bus handler, ingame events are fired here
@@ -21,6 +22,20 @@ public class EventHandler
     {
         if (event.getAdvancement().getDisplay() == null)
         {
+            return;
+        }
+
+        if (!(event.getEntity() instanceof ServerPlayer))
+        {
+            return;
+        }
+
+        if (event.getEntity().getClass() != ServerPlayer.class && ((ServerPlayer) event.getEntity()).connection == null)
+        {
+            Log.error(
+              "Trying to award advancement to a fake player which does not have a connection either, this is a bug in another mod and should not happen. printing trace: Entity:"
+                + event.getEntity(),
+              new Exception());
             return;
         }
 
