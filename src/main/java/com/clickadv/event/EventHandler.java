@@ -32,7 +32,7 @@ public class EventHandler
 
         if (event.getEntity().getClass() != ServerPlayer.class && ((ServerPlayer) event.getEntity()).connection == null)
         {
-            Log.error(
+            ClickAdvancements.LOGGER.error(
               "Trying to award advancement to a fake player which does not have a connection either, this is a bug in another mod and should not happen. printing trace: Entity:"
                 + event.getEntity(),
               new Exception());
