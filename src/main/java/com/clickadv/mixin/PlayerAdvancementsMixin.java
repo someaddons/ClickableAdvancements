@@ -1,9 +1,9 @@
 package com.clickadv.mixin;
 
 import com.clickadv.ClickAdvancements;
-import com.clickadv.advancements.AdvancementHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
@@ -14,7 +14,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(PlayerAdvancements.class)
@@ -23,16 +22,13 @@ public class PlayerAdvancementsMixin
     @Shadow
     private ServerPlayer player;
 
-    @Redirect(method = "award", at = @At(value = "INVOKE", target = "Lnet/minecraft/advancements/Advancement;getChatComponent()Lnet/minecraft/network/chat/Component;"))
-    private Component onGetComponent(final Advancement advancement)
+    @Inject(method = "award", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/PlayerAdvancements;markForVisibilityUpdate(Lnet/minecraft/advancements/AdvancementHolder;)V"))
+    public void onGrant(final AdvancementHolder advancementHolder, final String string, final CallbackInfoReturnable<Boolean> cir)
     {
-        return AdvancementHelper.buildAdvancementChatInfo(advancement);
-    }
-
-    @Inject(method = "award", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/PlayerAdvancements;markForVisibilityUpdate(Lnet/minecraft/advancements/Advancement;)V"))
-    public void onGrant(final Advancement advancement, final String criterionName, final CallbackInfoReturnable<Boolean> cir)
-    {
-        if (advancement.getDisplay() != null && !(advancement.getDisplay().shouldAnnounceChat() && player.level().getGameRules().getBoolean(GameRules.RULE_ANNOUNCE_ADVANCEMENTS)))
+        final Advancement advancement = advancementHolder.value();
+        if (advancement.display().isPresent() && !(advancement.display().get().shouldAnnounceChat() && player.level()
+                                                                                                         .getGameRules()
+                                                                                                         .getBoolean(GameRules.RULE_ANNOUNCE_ADVANCEMENTS)))
         {
             if (!(player instanceof ServerPlayer))
             {
@@ -48,32 +44,39 @@ public class PlayerAdvancementsMixin
                 return;
             }
 
-            if ((ClickAdvancements.config.getCommonConfig().showAllInLocalChat && advancement.getParent() != null && advancement.getDisplay().shouldShowToast()) || advancement
-              .getDisplay()
-              .shouldAnnounceChat())
+            if ((ClickAdvancements.config.getCommonConfig().showAllInLocalChat
+                   && advancement.parent().isPresent()
+                   && advancement.display().isPresent()
+                   && advancement.display().get().shouldShowToast())
+                  || (advancement.display().isPresent() && advancement.display().get().shouldAnnounceChat()))
             {
-                if (advancement.getChatComponent().getString().contains("recipe"))
+
+                MutableComponent chatComponent = advancement.display().get().getType().createAnnouncement(advancementHolder, player);
+                if (chatComponent == null || chatComponent.getString().contains("recipe"))
                 {
                     return;
                 }
 
-                MutableComponent desc = (MutableComponent) advancement.getDisplay().getDescription();
-                MutableComponent header = (MutableComponent) AdvancementHelper.buildAdvancementChatInfo(advancement);
+                MutableComponent desc = (MutableComponent) advancement.display().get().getDescription();
 
-                int lenght = header.getString().length();
+                int lenght = chatComponent.getString().length();
 
                 if (desc != null)
                 {
-                    header.append(Component.literal(" ")).append(desc.setStyle(Style.EMPTY.withColor(ChatFormatting.WHITE)));
+                    chatComponent.append(Component.literal(" ")).append(desc.setStyle(Style.EMPTY.withColor(ChatFormatting.WHITE)));
                     lenght += desc.getString().length();
                 }
 
                 if (lenght > 120)
                 {
-                    return;
+                    chatComponent = advancement.display().get().getType().createAnnouncement(advancementHolder, player);
+                    if (chatComponent.getString().length() > 120)
+                    {
+                        return;
+                    }
                 }
 
-                player.displayClientMessage(AdvancementHelper.buildAdvancementChatInfo(advancement), false);
+                player.displayClientMessage(chatComponent, false);
             }
         }
     }

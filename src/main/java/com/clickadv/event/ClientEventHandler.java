@@ -3,6 +3,8 @@ package com.clickadv.event;
 import com.clickadv.ClickAdvancements;
 import com.clickadv.advancements.AdvancementHelper;
 import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.AdvancementHolder;
+import net.minecraft.advancements.AdvancementNode;
 import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -46,12 +48,17 @@ public class ClientEventHandler
                 return true;
             }
 
-            final Advancement advancement = manager.getAdvancements().get(id);
-            Advancement tab = manager.getAdvancements().get(new ResourceLocation(id.getNamespace(), id.getPath().split("/")[0] + "/root"));
+            final AdvancementHolder advancementHolder = manager.get(id);
+            if (advancementHolder == null)
+            {
+                return true;
+            }
 
+            final Advancement advancement = advancementHolder.value();
+            AdvancementHolder tab = manager.get(ResourceLocation.fromNamespaceAndPath(id.getNamespace(), id.getPath().split("/")[0] + "/root"));
             if (tab == null)
             {
-                tab = manager.getAdvancements().get(new ResourceLocation(id.getNamespace(), "root"));
+                tab = manager.get(ResourceLocation.fromNamespaceAndPath(id.getNamespace(), "root"));
 
                 if (tab == null)
                 {
@@ -65,10 +72,10 @@ public class ClientEventHandler
 
                     for (int i = 0; i < 20; i++)
                     {
-                        if (current.getParent() != null)
+                        if (current.parent().isPresent() && manager.get(current.parent().get()) != null)
                         {
-                            tab = current.getParent();
-                            current = current.getParent();
+                            tab = manager.get(current.parent().get());
+                            current = manager.get(current.parent().get()).value();
                         }
                         else
                         {
@@ -78,7 +85,7 @@ public class ClientEventHandler
 
                     if (tab == null)
                     {
-                        tab = advancement;
+                        tab = advancementHolder;
                     }
                 }
             }
@@ -94,7 +101,7 @@ public class ClientEventHandler
                     return true;
                 }
 
-                final AdvancementWidget entry = actualScreen.getAdvancementWidget(advancement);
+                final AdvancementWidget entry = actualScreen.getAdvancementWidget(manager.getTree().get(advancementHolder.id()));
 
                 final int midX = (((IAdvancementTabGetter) actualScreen.selectedTab).maxX() - ((IAdvancementTabGetter) actualScreen.selectedTab).minX()) / 2;
                 final int midY = (((IAdvancementTabGetter) actualScreen.selectedTab).maxY() - ((IAdvancementTabGetter) actualScreen.selectedTab).minY()) / 2;
@@ -105,7 +112,7 @@ public class ClientEventHandler
             if (Minecraft.getInstance().screen instanceof ClientAdvancements.Listener)
             {
                 listener = (ClientAdvancements.Listener) Minecraft.getInstance().screen;
-                flashingEntry = advancement;
+                flashingEntry = manager.getTree().get(advancementHolder.id());
                 counter = 0;
                 progressInfo = ((IClientAdvancementManagerGetter) manager).getAdvancementProgressMap().get(advancement);
             }
@@ -115,9 +122,9 @@ public class ClientEventHandler
         return false;
     }
 
-    static               ClientAdvancements.Listener listener      = null;
-    static               Advancement                 flashingEntry = null;
-    static               AdvancementProgress         progressInfo  = null;
+    static ClientAdvancements.Listener listener      = null;
+    static AdvancementNode             flashingEntry = null;
+    static AdvancementProgress         progressInfo  = null;
     static               int                         counter       = 0;
     private static final AdvancementProgress         noProgress    = new AdvancementProgress();
 

@@ -15,7 +15,7 @@ public class AdvancementsScreenMixin extends Screen implements IAdvancementsScre
 {
     @Shadow
     @Nullable
-    private AdvancementTab selectedTab;
+    public AdvancementTab selectedTab;
 
     protected AdvancementsScreenMixin(final Component title)
     {
