@@ -1,7 +1,7 @@
 package com.clickadv.mixin;
 
 import com.clickadv.event.IClientAdvancementManagerGetter;
-import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.client.multiplayer.ClientAdvancements;
 import org.spongepowered.asm.mixin.Final;
@@ -15,10 +15,10 @@ public class ClientAdvancementManagerMixin implements IClientAdvancementManagerG
 {
     @Shadow
     @Final
-    private Map<Advancement, AdvancementProgress> progress;
+    private Map<AdvancementHolder, AdvancementProgress> progress;
 
     @Override
-    public Map<Advancement, AdvancementProgress> getAdvancementProgressMap()
+    public Map<AdvancementHolder, AdvancementProgress> getAdvancementProgressMap()
     {
         return progress;
     }

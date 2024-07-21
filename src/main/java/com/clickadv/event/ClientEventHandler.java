@@ -114,7 +114,7 @@ public class ClientEventHandler
                 listener = (ClientAdvancements.Listener) Minecraft.getInstance().screen;
                 flashingEntry = manager.getTree().get(advancementHolder.id());
                 counter = 0;
-                progressInfo = ((IClientAdvancementManagerGetter) manager).getAdvancementProgressMap().get(advancement);
+                progressInfo = ((IClientAdvancementManagerGetter) manager).getAdvancementProgressMap().get(advancementHolder);
             }
 
             return true;
