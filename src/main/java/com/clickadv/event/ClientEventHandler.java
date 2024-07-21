@@ -2,18 +2,18 @@ package com.clickadv.event;
 
 import com.clickadv.ClickAdvancements;
 import com.clickadv.advancements.AdvancementHelper;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.AdvancementHolder;
+import net.minecraft.advancements.AdvancementNode;
 import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.advancements.AdvancementWidget;
 import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
 import net.minecraft.client.multiplayer.ClientAdvancements;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
 
 public class ClientEventHandler
 {
@@ -30,17 +30,18 @@ public class ClientEventHandler
             return true;
         }
 
-        @OnlyIn(Dist.CLIENT)
+        @Override
         public float getPercent()
         {
             return 105f;
         }
     };
 
-    public static boolean onMessage(String message)
+    public static boolean onMessage(final String message)
     {
         if (message.contains(AdvancementHelper.COMMAND) && Minecraft.getInstance().player != null)
         {
+
             final ClientAdvancements manager = Minecraft.getInstance().player.connection.getAdvancements();
             final ResourceLocation id = AdvancementHelper.getAdvancementID(message);
 
@@ -49,18 +50,23 @@ public class ClientEventHandler
                 return true;
             }
 
-            final Advancement advancement = manager.getAdvancements().get(id);
-            Advancement tab = manager.getAdvancements().get(new ResourceLocation(id.getNamespace(), id.getPath().split("/")[0] + "/root"));
+            final AdvancementHolder advancementHolder = manager.get(id);
+            if (advancementHolder == null)
+            {
+                return true;
+            }
 
+            final Advancement advancement = advancementHolder.value();
+            AdvancementHolder tab = manager.get(ResourceLocation.fromNamespaceAndPath(id.getNamespace(), id.getPath().split("/")[0] + "/root"));
             if (tab == null)
             {
-                tab = manager.getAdvancements().get(new ResourceLocation(id.getNamespace(), "root"));
+                tab = manager.get(ResourceLocation.fromNamespaceAndPath(id.getNamespace(), "root"));
 
                 if (tab == null)
                 {
                     Advancement current = advancement;
 
-                    if (advancement == null)
+                    if (current == null)
                     {
                         ClickAdvancements.LOGGER.info("Could not find advancement for id:" + id);
                         return true;
@@ -68,10 +74,10 @@ public class ClientEventHandler
 
                     for (int i = 0; i < 20; i++)
                     {
-                        if (current.getParent() != null)
+                        if (current.parent().isPresent() && manager.get(current.parent().get()) != null)
                         {
-                            tab = current.getParent();
-                            current = current.getParent();
+                            tab = manager.get(current.parent().get());
+                            current = manager.get(current.parent().get()).value();
                         }
                         else
                         {
@@ -81,7 +87,7 @@ public class ClientEventHandler
 
                     if (tab == null)
                     {
-                        tab = advancement;
+                        tab = advancementHolder;
                     }
                 }
             }
@@ -97,8 +103,7 @@ public class ClientEventHandler
                     return true;
                 }
 
-                //actualScreen.selectedTab.drawContents(new PoseStack(), 0, 0);
-                final AdvancementWidget entry = actualScreen.getAdvancementWidget(advancement);
+                final AdvancementWidget entry = actualScreen.getAdvancementWidget(manager.getTree().get(advancementHolder.id()));
 
                 final int midX = (actualScreen.selectedTab.maxX - actualScreen.selectedTab.minX) / 2;
                 final int midY = (actualScreen.selectedTab.maxY - actualScreen.selectedTab.minY) / 2;
@@ -109,9 +114,9 @@ public class ClientEventHandler
             if (Minecraft.getInstance().screen instanceof ClientAdvancements.Listener)
             {
                 listener = (ClientAdvancements.Listener) Minecraft.getInstance().screen;
-                flashingEntry = advancement;
+                flashingEntry = manager.getTree().get(advancementHolder.id());
                 counter = 0;
-                progressInfo = manager.progress.get(advancement);
+                progressInfo = manager.progress.get(advancementHolder);
             }
 
             return true;
@@ -119,14 +124,14 @@ public class ClientEventHandler
         return false;
     }
 
-    static               ClientAdvancements.Listener listener      = null;
-    static               Advancement                 flashingEntry = null;
-    static               AdvancementProgress         progressInfo  = null;
+    static ClientAdvancements.Listener listener      = null;
+    static AdvancementNode             flashingEntry = null;
+    static AdvancementProgress         progressInfo  = null;
     static               int                         counter       = 0;
     private static final AdvancementProgress         noProgress    = new AdvancementProgress();
 
     @SubscribeEvent
-    public static void OnTick(TickEvent.ClientTickEvent event)
+    public static void OnTick(ClientTickEvent.Post event)
     {
         if (flashingEntry != null && Minecraft.getInstance().screen == listener)
         {
