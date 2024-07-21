@@ -4,10 +4,10 @@
   "compatibilityLevel": "JAVA_21",
   "refmap": "clickadv-fabric-refmap.json",
   "mixins": [
+    "AdvancementClickableMixin",
     "PlayerAdvancementsMixin"
   ],
   "client": [
-    "AdvancementClickableMixin",
     "AdvancementsScreenMixin",
     "AdvancementTabMixin",
     "ClientAdvancementManagerMixin",
