@@ -102,7 +102,7 @@ dependencies {
     minecraft "net.minecraftforge:forge:${mc_version}-${forge_version}" //21
 
     annotationProcessor "org.spongepowered:mixin:0.8.5:processor"
-    implementation fg.deobf("com.cupboard:cupboard:1.20.1-1.2")
+    implementation fg.deobf("curse.maven:cupboard-326652:7746490")
 }
 
 jar {

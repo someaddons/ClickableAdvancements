@@ -1,5 +1,6 @@
 package com.clickadv.mixin;
 
+import com.clickadv.ClickAdvancements;
 import com.clickadv.event.ClientEventHandler;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.ClickEvent;
@@ -21,8 +22,16 @@ public class ScreenMixin
         }
 
         final ClickEvent event = style.getClickEvent();
-        if (event != null && ClientEventHandler.onMessage(event.getValue()))
+        try
         {
+            if (event != null && ClientEventHandler.onMessage(event.getValue()))
+        {
+            cir.setReturnValue(false);
+        }
+        }
+        catch (Exception e)
+        {
+            ClickAdvancements.LOGGER.warn("Error during trying to jump to advancement, might be caused by conflicting mods changing the advancement screen", e);
             cir.setReturnValue(false);
         }
     }

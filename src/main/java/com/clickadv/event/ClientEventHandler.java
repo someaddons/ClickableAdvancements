@@ -2,7 +2,6 @@ package com.clickadv.event;
 
 import com.clickadv.ClickAdvancements;
 import com.clickadv.advancements.AdvancementHelper;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.client.Minecraft;
@@ -10,8 +9,6 @@ import net.minecraft.client.gui.screens.advancements.AdvancementWidget;
 import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
 import net.minecraft.client.multiplayer.ClientAdvancements;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
@@ -30,17 +27,18 @@ public class ClientEventHandler
             return true;
         }
 
-        @OnlyIn(Dist.CLIENT)
+        @Override
         public float getPercent()
         {
             return 105f;
         }
     };
 
-    public static boolean onMessage(String message)
+    public static boolean onMessage(final String message)
     {
         if (message.contains(AdvancementHelper.COMMAND) && Minecraft.getInstance().player != null)
         {
+
             final ClientAdvancements manager = Minecraft.getInstance().player.connection.getAdvancements();
             final ResourceLocation id = AdvancementHelper.getAdvancementID(message);
 
@@ -92,18 +90,13 @@ public class ClientEventHandler
             if (Minecraft.getInstance().screen instanceof AdvancementsScreen)
             {
                 final AdvancementsScreen actualScreen = (AdvancementsScreen) Minecraft.getInstance().screen;
-                if (actualScreen.selectedTab == null || advancement == null)
+                if (!(actualScreen.selectedTab instanceof IAdvancementTabSetter advancementTabSetter) || advancement == null)
                 {
                     return true;
                 }
 
-                //actualScreen.selectedTab.drawContents(new PoseStack(), 0, 0);
                 final AdvancementWidget entry = actualScreen.getAdvancementWidget(advancement);
-
-                final int midX = (actualScreen.selectedTab.maxX - actualScreen.selectedTab.minX) / 2;
-                final int midY = (actualScreen.selectedTab.maxY - actualScreen.selectedTab.minY) / 2;
-
-                actualScreen.selectedTab.scroll(midX - entry.getX(), midY - entry.getY());
+                advancementTabSetter.setFocusWidget(entry);
             }
 
             if (Minecraft.getInstance().screen instanceof ClientAdvancements.Listener)
