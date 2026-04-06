@@ -98,17 +98,13 @@ public class ClientEventHandler
             if (Minecraft.getInstance().screen instanceof AdvancementsScreen)
             {
                 final AdvancementsScreen actualScreen = (AdvancementsScreen) Minecraft.getInstance().screen;
-                if (actualScreen.selectedTab == null || advancement == null)
+                if (!(actualScreen.selectedTab instanceof IAdvancementTabSetter advancementTabSetter) || advancement == null)
                 {
                     return true;
                 }
 
                 final AdvancementWidget entry = actualScreen.getAdvancementWidget(manager.getTree().get(advancementHolder.id()));
-
-                final int midX = (actualScreen.selectedTab.maxX - actualScreen.selectedTab.minX) / 2;
-                final int midY = (actualScreen.selectedTab.maxY - actualScreen.selectedTab.minY) / 2;
-
-                actualScreen.selectedTab.scroll(midX - entry.getX(), midY - entry.getY());
+                advancementTabSetter.setFocusWidget(entry);
             }
 
             if (Minecraft.getInstance().screen instanceof ClientAdvancements.Listener)

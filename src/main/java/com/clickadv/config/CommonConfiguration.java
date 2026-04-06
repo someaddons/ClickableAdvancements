@@ -5,7 +5,8 @@ import com.google.gson.JsonObject;
 
 public class CommonConfiguration implements ICommonConfig
 {
-    public boolean showAllInLocalChat = true;
+    public boolean showAllInLocalChat        = true;
+    public boolean sortDisplayAlphabetically = true;
 
     public CommonConfiguration()
     {
@@ -24,6 +25,11 @@ public class CommonConfiguration implements ICommonConfig
         entry.addProperty("showAllInLocalChat", showAllInLocalChat);
         root.add("showAllInLocalChat", entry);
 
+        final JsonObject entry2 = new JsonObject();
+        entry2.addProperty("desc:", "Sorts the displayed Advancements within a tab by alphabetic order");
+        entry2.addProperty("sortDisplayAlphabetically", sortDisplayAlphabetically);
+        root.add("sortDisplayAlphabetically", entry2);
+
         return root;
     }
 
@@ -31,5 +37,6 @@ public class CommonConfiguration implements ICommonConfig
     public void deserialize(JsonObject data)
     {
         showAllInLocalChat = data.get("showAllInLocalChat").getAsJsonObject().get("showAllInLocalChat").getAsBoolean();
+        sortDisplayAlphabetically = data.get("sortDisplayAlphabetically").getAsJsonObject().get("sortDisplayAlphabetically").getAsBoolean();
     }
 }
