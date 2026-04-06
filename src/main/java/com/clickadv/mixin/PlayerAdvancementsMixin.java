@@ -9,7 +9,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.server.PlayerAdvancements;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.gamerules.GameRules;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -28,7 +28,7 @@ public class PlayerAdvancementsMixin
         final Advancement advancement = advancementHolder.value();
         if (advancement.display().isPresent() && !(advancement.display().get().shouldAnnounceChat() && player.level()
                                                                                                          .getGameRules()
-                                                                                                         .getBoolean(GameRules.RULE_ANNOUNCE_ADVANCEMENTS)))
+            .get(GameRules.SHOW_ADVANCEMENT_MESSAGES)))
         {
             if (!(player instanceof ServerPlayer))
             {
@@ -76,7 +76,7 @@ public class PlayerAdvancementsMixin
                     }
                 }
 
-                player.displayClientMessage(chatComponent, false);
+                player.sendSystemMessage(chatComponent);
             }
         }
     }
