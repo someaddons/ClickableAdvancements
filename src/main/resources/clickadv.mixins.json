@@ -5,6 +5,7 @@
   "refmap": "clickadv-fabric-refmap.json",
   "mixins": [
     "AdvancementClickableMixin",
+    "AdvancementNodeMixin",
     "PlayerAdvancementsMixin"
   ],
   "client": [

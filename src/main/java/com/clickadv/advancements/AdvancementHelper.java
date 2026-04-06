@@ -1,9 +1,9 @@
 package com.clickadv.advancements;
 
+import com.cupboard.util.ResourceLocation;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,7 +16,7 @@ public class AdvancementHelper
       @NotNull final AdvancementHolder advancementHolder,
       final ServerPlayer serverPlayer)
     {
-        filledComponent.setStyle(filledComponent.getStyle().withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, COMMAND + advancementHolder.id())));
+        filledComponent.setStyle(filledComponent.getStyle().withClickEvent(new ClickEvent.RunCommand(COMMAND + advancementHolder.id())));
         return filledComponent;
     }
 

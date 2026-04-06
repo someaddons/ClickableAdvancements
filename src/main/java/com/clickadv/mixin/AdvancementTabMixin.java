@@ -1,47 +1,54 @@
 package com.clickadv.mixin;
 
-import com.clickadv.event.IAdvancementTabGetter;
+import com.clickadv.event.IAdvancementTabSetter;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.advancements.AdvancementTab;
+import net.minecraft.client.gui.screens.advancements.AdvancementWidget;
+import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(AdvancementTab.class)
-public class AdvancementTabMixin implements IAdvancementTabGetter
+public abstract class AdvancementTabMixin implements IAdvancementTabSetter
 {
+    @Shadow
+    private boolean centered;
 
     @Shadow
-    private int maxX;
+    public abstract void scroll(final double x, final double y);
 
     @Shadow
-    private int minY;
+    private double scrollX;
+    @Shadow
+    private double scrollY;
+    @Shadow
+    private int    maxX;
+    @Shadow
+    private int    maxY;
 
     @Shadow
-    private int minX;
+    public abstract AdvancementsScreen getScreen();
 
-    @Shadow
-    private int maxY;
+    @Unique
+    private AdvancementWidget focusWidget = null;
 
-    @Override
-    public int maxX()
+    @Inject(method = "extractContents", at = @At("HEAD"))
+    private void initPosition(final GuiGraphicsExtractor graphics, final int windowLeft, final int windowTop, final CallbackInfo ci)
     {
-        return maxX;
+        if (!centered && focusWidget != null)
+        {
+            centered = true;
+            scroll((-focusWidget.getX() + 50) - scrollX, (-focusWidget.getY() + 50) - scrollY);
+        }
     }
 
     @Override
-    public int minX()
+    public void setFocusWidget(AdvancementWidget widget)
     {
-        return minX;
-    }
-
-    @Override
-    public int minY()
-    {
-        return minY;
-    }
-
-    @Override
-    public int maxY()
-    {
-        return maxY;
+        focusWidget = widget;
     }
 }

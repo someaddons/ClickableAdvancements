@@ -2,6 +2,7 @@ package com.clickadv.event;
 
 import com.clickadv.ClickAdvancements;
 import com.clickadv.advancements.AdvancementHelper;
+import com.cupboard.util.ResourceLocation;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.AdvancementNode;
@@ -11,7 +12,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.advancements.AdvancementWidget;
 import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
 import net.minecraft.client.multiplayer.ClientAdvancements;
-import net.minecraft.resources.ResourceLocation;
 
 public class ClientEventHandler
 {
@@ -96,17 +96,13 @@ public class ClientEventHandler
             if (Minecraft.getInstance().screen instanceof AdvancementsScreen)
             {
                 final AdvancementsScreen actualScreen = (AdvancementsScreen) Minecraft.getInstance().screen;
-                if (actualScreen.selectedTab == null || advancement == null)
+                if (!(actualScreen.selectedTab instanceof IAdvancementTabSetter advancementTabSetter) || advancement == null)
                 {
                     return true;
                 }
 
                 final AdvancementWidget entry = actualScreen.getAdvancementWidget(manager.getTree().get(advancementHolder.id()));
-
-                final int midX = (((IAdvancementTabGetter) actualScreen.selectedTab).maxX() - ((IAdvancementTabGetter) actualScreen.selectedTab).minX()) / 2;
-                final int midY = (((IAdvancementTabGetter) actualScreen.selectedTab).maxY() - ((IAdvancementTabGetter) actualScreen.selectedTab).minY()) / 2;
-
-                actualScreen.selectedTab.scroll(midX - entry.getX(), midY - entry.getY());
+                advancementTabSetter.setFocusWidget(entry);
             }
 
             if (Minecraft.getInstance().screen instanceof ClientAdvancements.Listener)
