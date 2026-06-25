@@ -91,11 +91,11 @@ public class ClientEventHandler
             }
 
             final AdvancementsScreen screen = new AdvancementsScreen(manager);
-            Minecraft.getInstance().setScreen(screen);
+            Minecraft.getInstance().gui.setScreen(screen);
             manager.setSelectedTab(tab, true);
-            if (Minecraft.getInstance().screen instanceof AdvancementsScreen)
+            if (Minecraft.getInstance().gui.screen() instanceof AdvancementsScreen)
             {
-                final AdvancementsScreen actualScreen = (AdvancementsScreen) Minecraft.getInstance().screen;
+                final AdvancementsScreen actualScreen = (AdvancementsScreen) Minecraft.getInstance().gui.screen();
                 if (!(actualScreen.selectedTab instanceof IAdvancementTabSetter advancementTabSetter) || advancement == null)
                 {
                     return true;
@@ -105,9 +105,9 @@ public class ClientEventHandler
                 advancementTabSetter.setFocusWidget(entry);
             }
 
-            if (Minecraft.getInstance().screen instanceof ClientAdvancements.Listener)
+            if (Minecraft.getInstance().gui.screen() instanceof ClientAdvancements.Listener)
             {
-                listener = (ClientAdvancements.Listener) Minecraft.getInstance().screen;
+                listener = (ClientAdvancements.Listener) Minecraft.getInstance().gui.screen();
                 flashingEntry = manager.getTree().get(advancementHolder.id());
                 counter = 0;
                 progressInfo = ((IClientAdvancementManagerGetter) manager).getAdvancementProgressMap().get(advancementHolder);
@@ -126,7 +126,7 @@ public class ClientEventHandler
 
     public static void onTick(final Screen screen)
     {
-        if (flashingEntry != null && Minecraft.getInstance().screen == listener)
+        if (flashingEntry != null && Minecraft.getInstance().gui.screen() == listener)
         {
             if (++counter >= 10)
             {
