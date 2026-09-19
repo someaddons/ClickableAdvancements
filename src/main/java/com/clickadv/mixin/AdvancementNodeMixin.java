@@ -26,7 +26,7 @@ public class AdvancementNodeMixin
             final String name;
             if (advancementNode.holder().value().display().isPresent())
             {
-                name = advancementNode.holder().value().display().get().getTitle().getString();
+                name = advancementNode.holder().value().display().get().title().getString();
             }
             else
             {

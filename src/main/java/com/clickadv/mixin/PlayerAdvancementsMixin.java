@@ -26,7 +26,7 @@ public class PlayerAdvancementsMixin
     public void onGrant(final AdvancementHolder advancementHolder, final String string, final CallbackInfoReturnable<Boolean> cir)
     {
         final Advancement advancement = advancementHolder.value();
-        if (advancement.display().isPresent() && !(advancement.display().get().shouldAnnounceChat() && player.level()
+        if (advancement.display().isPresent() && !(advancement.display().get().announceToChat() && player.level()
                                                                                                          .getGameRules()
             .get(GameRules.SHOW_ADVANCEMENT_MESSAGES)))
         {
@@ -47,17 +47,17 @@ public class PlayerAdvancementsMixin
             if ((ClickAdvancements.config.getCommonConfig().showAllInLocalChat
                    && advancement.parent().isPresent()
                    && advancement.display().isPresent()
-                   && advancement.display().get().shouldShowToast())
-                  || (advancement.display().isPresent() && advancement.display().get().shouldAnnounceChat()))
+                && advancement.display().get().showToast())
+                || (advancement.display().isPresent() && advancement.display().get().announceToChat()))
             {
 
-                MutableComponent chatComponent = advancement.display().get().getType().createAnnouncement(advancementHolder, player);
+                MutableComponent chatComponent = advancement.display().get().type().createAnnouncement(advancementHolder, player);
                 if (chatComponent == null || chatComponent.getString().contains("recipe"))
                 {
                     return;
                 }
 
-                MutableComponent desc = (MutableComponent) advancement.display().get().getDescription();
+                MutableComponent desc = (MutableComponent) advancement.display().get().description();
 
                 int lenght = chatComponent.getString().length();
 
@@ -69,7 +69,7 @@ public class PlayerAdvancementsMixin
 
                 if (lenght > 120)
                 {
-                    chatComponent = advancement.display().get().getType().createAnnouncement(advancementHolder, player);
+                    chatComponent = advancement.display().get().type().createAnnouncement(advancementHolder, player);
                     if (chatComponent.getString().length() > 120)
                     {
                         return;

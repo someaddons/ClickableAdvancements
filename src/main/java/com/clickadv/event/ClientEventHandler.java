@@ -102,14 +102,14 @@ public class ClientEventHandler
                     return true;
                 }
 
-                final AdvancementWidget entry = actualScreen.getAdvancementWidget(manager.getTree().get(advancementHolder.id()));
+                final AdvancementWidget entry = actualScreen.getAdvancementWidget(manager.tree().get(advancementHolder.id()));
                 advancementTabSetter.setFocusWidget(entry);
             }
 
             if (Minecraft.getInstance().gui.screen() instanceof ClientAdvancements.Listener)
             {
                 listener = (ClientAdvancements.Listener) Minecraft.getInstance().gui.screen();
-                flashingEntry = manager.getTree().get(advancementHolder.id());
+                flashingEntry = manager.tree().get(advancementHolder.id());
                 counter = 0;
                 progressInfo = manager.progress.get(advancementHolder);
             }
@@ -128,25 +128,54 @@ public class ClientEventHandler
     @SubscribeEvent
     public static void OnTick(ClientTickEvent.Post event)
     {
-        if (flashingEntry != null && Minecraft.getInstance().gui.screen() == listener)
+        if (Minecraft.getInstance().player == null)
+        {
+            return;
+        }
+
+        final ClientAdvancements manager = Minecraft.getInstance().player.connection.getAdvancements();
+        if (flashingEntry != null && Minecraft.getInstance().gui.screen() == listener && manager != null)
         {
             if (++counter >= 10)
             {
                 if (counter % 20 >= 10)
                 {
-                    listener.onUpdateAdvancementProgress(flashingEntry, noProgress);
+                    adjustProgress(manager, flashingEntry, noProgress);
                 }
                 else
                 {
-                    listener.onUpdateAdvancementProgress(flashingEntry, doneProgress);
+                    adjustProgress(manager, flashingEntry, doneProgress);
                     if (counter > BLINK_TIME_TICKS)
                     {
                         counter = 0;
-                        listener.onUpdateAdvancementProgress(flashingEntry, progressInfo);
+                        adjustProgress(manager, flashingEntry, progressInfo);
                         flashingEntry = null;
                     }
                 }
             }
+        }
+        else if (flashingEntry != null)
+        {
+            adjustProgress(manager, flashingEntry, progressInfo);
+            counter = 0;
+            flashingEntry = null;
+        }
+    }
+
+    private static void adjustProgress(ClientAdvancements manager, AdvancementNode node, AdvancementProgress progress)
+    {
+        if (Minecraft.getInstance().gui.screen() instanceof AdvancementsScreen advancementsScreen)
+        {
+            final AdvancementWidget widget = advancementsScreen.getAdvancementWidget(manager.tree().get(node.holder().id()));
+            if (widget != null)
+            {
+                widget.setProgress(progress);
+            }
+        }
+        else
+        {
+            manager.progress().put(flashingEntry.holder(), progressInfo);
+            listener.onAdvancementsUpdated();
         }
     }
 }
