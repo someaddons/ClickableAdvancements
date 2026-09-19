@@ -9,6 +9,9 @@ import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(AdvancementsScreen.class)
 public class AdvancementsScreenMixin extends Screen implements IAdvancementsScreenGetter
@@ -28,8 +31,8 @@ public class AdvancementsScreenMixin extends Screen implements IAdvancementsScre
         return selectedTab;
     }
 
-    @Override
-    public void tick()
+    @Inject(method = "tick", at = @At("HEAD"))
+    public void ontick(final CallbackInfo ci)
     {
         ClientEventHandler.onTick(this);
     }
